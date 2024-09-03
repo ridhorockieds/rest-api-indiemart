@@ -50,6 +50,13 @@ class CategoryController extends Controller
 
     public function update(Request $request)
     {
+
+        $category = Category::find($request->input('id'));
+
+        if (!$category) {
+            return response()->json(['message' => 'Category Not Found!'], 404);
+        }
+
         $validation = Validator::make($request->all(), [
             'name' => 'required'
         ]);
@@ -59,15 +66,11 @@ class CategoryController extends Controller
                 'message' => $validation->errors(),
             ], 400);
         }
-        $category = Category::where('id', $request->input('id'))->update([
+        $category->update([
             'name' => $request->input('name'),
         ]);
 
-        if ($category) {
-            return response()->json([
-                'message' => 'Update success',
-            ], 200);
-        }
+        return response()->json(['message' => 'Category Updated'], 200);
     }
 
     public function destroy($id)
@@ -76,8 +79,8 @@ class CategoryController extends Controller
 
         if (!$category) {
             return response()->json([
-                'message' => 'Failed delete category!'
-            ], 401);
+                'message' => 'Category Not Found'
+            ], 404);
         }
 
         $category->delete();
